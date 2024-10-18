@@ -1,58 +1,37 @@
 package main
 
 import (
-	"log"
+	"log/slog"
 	"net/http"
 	"os"
-	"path/filepath"
 )
 
+type application struct {
+	logger *slog.Logger
+	config *config
+}
+
+type config struct {
+	addr      string
+	staticDir string
+}
+
 func main() {
-	mux := http.NewServeMux()
+	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
 
-	fileServer := http.FileServer(staticFileSystem{http.Dir("./ui/static/")})
-	mux.Handle("/static", http.NotFoundHandler())
-	mux.Handle("GET /static/", http.StripPrefix("/static", fileServer))
-
-	mux.HandleFunc("GET /{$}", home)
-	mux.HandleFunc("GET /snippet/view/{id}", getSnippetView)
-	mux.HandleFunc("GET /snippet/create", getSnippetCreate)
-	mux.HandleFunc("POST /snippet/create", postSnippetCreate)
-
-	port := os.Getenv("HTTP_LISTEN_ADDR")
-	log.Printf("Starting server on %s", port)
-
-	err := http.ListenAndServe(port, mux)
-	log.Fatal(err)
-}
-
-// Prevent directory attacks on static files
-type staticFileSystem struct {
-	fs http.FileSystem
-}
-
-func (sfs staticFileSystem) Open(path string) (http.File, error) {
-	file, err := sfs.fs.Open(path)
-	if err != nil {
-		return nil, err
+	config := &config{
+		addr:      os.Getenv("HTTP_LISTEN_ADDR"),
+		staticDir: os.Getenv("STATIC_DIR"),
 	}
 
-	stat, err := file.Stat()
-	if err != nil {
-		return nil, err
+	app := &application{
+		logger: logger,
+		config: config,
 	}
 
-	if stat.IsDir() {
-		index := filepath.Join(path, "index.html")
-		if _, err := sfs.fs.Open(index); err != nil {
-			closeErr := file.Close()
-			if closeErr != nil {
-				return nil, closeErr
-			}
+	logger.Info("Starting server", "addr", config.addr)
 
-			return nil, err
-		}
-	}
-
-	return file, nil
+	err := http.ListenAndServe(config.addr, app.routes())
+	logger.Error(err.Error())
+	os.Exit(1)
 }
