@@ -7,11 +7,13 @@ import (
 	"os"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/jeremydwayne/snippets/internal/models"
 )
 
 type application struct {
-	logger *slog.Logger
-	config *config
+	logger   *slog.Logger
+	config   *config
+	snippets *models.SnippetModel
 }
 
 type config struct {
@@ -35,8 +37,9 @@ func main() {
 	defer db.Close()
 
 	app := &application{
-		logger: logger,
-		config: config,
+		logger:   logger,
+		config:   config,
+		snippets: &models.SnippetModel{DB: db},
 	}
 
 	logger.Info("Starting server", "addr", config.addr)
