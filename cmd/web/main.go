@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"log/slog"
 	"net/http"
 	"os"
 	"text/template"
@@ -17,26 +16,17 @@ import (
 )
 
 type application struct {
-	logger         *slog.Logger
-	config         *config
+	logger         *log.Logger
 	snippets       *models.SnippetModel
 	templateCache  map[string]*template.Template
 	formDecoder    *form.Decoder
 	sessionManager *scs.SessionManager
 }
 
-type config struct {
-	addr      string
-	staticDir string
-}
-
 func main() {
-	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
-
-	config := &config{
-		addr:      os.Getenv("HTTP_LISTEN_ADDR"),
-		staticDir: os.Getenv("STATIC_DIR"),
-	}
+	logger := log.NewWithOptions(os.Stdout, log.Options{
+		ReportTimestamp: true,
+	})
 
 	db, err := openDB(os.Getenv("DATABASE_URL"))
 	if err != nil {
@@ -59,16 +49,25 @@ func main() {
 
 	app := &application{
 		logger:         logger,
-		config:         config,
 		snippets:       &models.SnippetModel{DB: db},
 		templateCache:  templateCache,
 		formDecoder:    formDecoder,
 		sessionManager: sessionManager,
 	}
 
-	log.Info("Starting server", "addr", config.addr)
+	stdlog := logger.StandardLog(log.StandardLogOptions{
+		ForceLevel: log.ErrorLevel,
+	})
 
-	err = http.ListenAndServe(config.addr, app.routes())
+	srv := &http.Server{
+		Addr:     os.Getenv("HTTP_LISTEN_ADDR"),
+		Handler:  app.routes(),
+		ErrorLog: stdlog,
+	}
+
+	log.Info("Starting server", "addr", srv.Addr)
+
+	err = srv.ListenAndServe()
 	logger.Error(err.Error())
 	os.Exit(1)
 }

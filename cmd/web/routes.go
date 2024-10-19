@@ -11,7 +11,7 @@ func (app *application) routes() http.Handler {
 	mux := http.NewServeMux()
 
 	// Static Files
-	fileServer := http.FileServer(staticFileSystem{http.Dir(app.config.staticDir)})
+	fileServer := http.FileServer(staticFileSystem{http.Dir("./ui/static/")})
 	mux.Handle("/static", http.NotFoundHandler())
 	mux.Handle("GET /static/", http.StripPrefix("/static", fileServer))
 
