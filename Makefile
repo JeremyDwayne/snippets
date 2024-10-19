@@ -22,7 +22,7 @@ server:
 	@go run github.com/air-verse/air@latest \
 	--build.cmd "go build --tags dev -o ${MAIN_PATH} ./cmd/web/" --build.bin "${MAIN_PATH}" \
 	--build.exclude_dir "node_modules" \
-	--build.include_ext "go" \
+	--build.include_ext "go,tmpl" \
 	--build.stop_on_error "false" \
 	--misc.clean_on_exit true \
 	--screen.clear_on_rebuild true \
