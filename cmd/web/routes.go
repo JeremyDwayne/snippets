@@ -25,6 +25,13 @@ func (app *application) routes() http.Handler {
 	mux.Handle("GET /snippet/create", dynamicMiddleware.ThenFunc(app.getSnippetCreate))
 	mux.Handle("POST /snippet/create", dynamicMiddleware.ThenFunc(app.postSnippetCreate))
 
+	// User Auth
+	mux.Handle("GET /user/signup", dynamicMiddleware.ThenFunc(app.getUserSignup))
+	mux.Handle("POST /user/signup", dynamicMiddleware.ThenFunc(app.postUserSignup))
+	mux.Handle("GET /user/login", dynamicMiddleware.ThenFunc(app.getUserLogin))
+	mux.Handle("POST /user/login", dynamicMiddleware.ThenFunc(app.postUserLogin))
+	mux.Handle("POST /user/logout", dynamicMiddleware.ThenFunc(app.postUserLogout))
+
 	standardMiddleware := alice.New(app.recoverPanic, app.logRequest, commonHeaders)
 	return standardMiddleware.Then(mux)
 }
