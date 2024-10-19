@@ -7,6 +7,7 @@ import (
 	"os"
 	"text/template"
 
+	"github.com/charmbracelet/log"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jeremydwayne/snippets/internal/models"
 )
@@ -33,14 +34,14 @@ func main() {
 
 	db, err := openDB(os.Getenv("DATABASE_URL"))
 	if err != nil {
-		logger.Error(err.Error())
+		log.Error(err.Error())
 		os.Exit(1)
 	}
 	defer db.Close()
 
 	templateCache, err := newTemplateCache()
 	if err != nil {
-		logger.Error(err.Error())
+		log.Error(err.Error())
 		os.Exit(1)
 	}
 
@@ -51,7 +52,7 @@ func main() {
 		templateCache: templateCache,
 	}
 
-	logger.Info("Starting server", "addr", config.addr)
+	log.Info("Starting server", "addr", config.addr)
 
 	err = http.ListenAndServe(config.addr, app.routes())
 	logger.Error(err.Error())

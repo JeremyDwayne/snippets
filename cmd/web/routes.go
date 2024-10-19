@@ -3,9 +3,11 @@ package main
 import (
 	"net/http"
 	"path/filepath"
+
+	"github.com/justinas/alice"
 )
 
-func (app *application) routes() *http.ServeMux {
+func (app *application) routes() http.Handler {
 	mux := http.NewServeMux()
 
 	// Static Files
@@ -21,7 +23,8 @@ func (app *application) routes() *http.ServeMux {
 	mux.HandleFunc("GET /snippet/create", app.getSnippetCreate)
 	mux.HandleFunc("POST /snippet/create", app.postSnippetCreate)
 
-	return mux
+	middleware := alice.New(app.recoverPanic, app.logRequest, commonHeaders)
+	return middleware.Then(mux)
 }
 
 type staticFileSystem struct {

@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"runtime/debug"
 	"time"
+
+	"github.com/charmbracelet/log"
 )
 
 func (app *application) serverError(w http.ResponseWriter, r *http.Request, err error) {
@@ -15,7 +17,7 @@ func (app *application) serverError(w http.ResponseWriter, r *http.Request, err 
 		trace  = string(debug.Stack())
 	)
 
-	app.logger.Error(err.Error(), "method", method, "uri", uri, "trace", trace)
+	log.Error(err.Error(), "method", method, "uri", uri, "trace", trace)
 	http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 }
 
