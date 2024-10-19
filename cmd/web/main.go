@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"database/sql"
 	"net/http"
 	"os"
@@ -59,15 +60,23 @@ func main() {
 		ForceLevel: log.ErrorLevel,
 	})
 
+	tlsConfig := &tls.Config{
+		CurvePreferences: []tls.CurveID{tls.X25519, tls.CurveP256},
+	}
+
 	srv := &http.Server{
-		Addr:     os.Getenv("HTTP_LISTEN_ADDR"),
-		Handler:  app.routes(),
-		ErrorLog: stdlog,
+		Addr:         os.Getenv("HTTP_LISTEN_ADDR"),
+		Handler:      app.routes(),
+		ErrorLog:     stdlog,
+		TLSConfig:    tlsConfig,
+		IdleTimeout:  time.Minute,
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 10 * time.Second,
 	}
 
 	log.Info("Starting server", "addr", srv.Addr)
 
-	err = srv.ListenAndServe()
+	err = srv.ListenAndServeTLS("./tls/cert.pem", "./tls/key.pem")
 	logger.Error(err.Error())
 	os.Exit(1)
 }
