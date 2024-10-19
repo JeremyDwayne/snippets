@@ -42,7 +42,7 @@ dev:
 	# @make -j5 templ server watch-assets watch-esbuild sync_assets
 
 build:
-	@npx tailwindcss -i ui/static/main.css -o public/assets/style.css
-	@npx esbuild ui/static/index.js --bundle --outdir=public/assets
-	@go build -o bin/app_prod cmd/app/main.go
+	# @npx tailwindcss -i ui/static/css/main.css -o public/assets/style.css
+	# @npx esbuild ui/static/index.js --bundle --outdir=public/assets
+	@go build -o bin/app_prod ./cmd/web/
 	@echo "compiled you application with all its assets to a single binary => bin/app_prod"

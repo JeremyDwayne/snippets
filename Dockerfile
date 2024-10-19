@@ -1,4 +1,4 @@
-FROM golang:1.22.5-bullseye AS builder
+FROM golang:1.23.0-bullseye AS builder
 WORKDIR /app
 RUN apt-get update -qq && \
   apt-get install --no-install-recommends -y build-essential pkg-config python-is-python3 upx
@@ -10,12 +10,12 @@ RUN curl -fsSL https://deb.nodesource.com/setup_current.x | bash - && \
   npm --version
 
 # install zig toolchain
-RUN wget https://ziglang.org/download/0.13.0/zig-linux-x86_64-0.13.0.tar.xz && \
-  tar -xf zig-linux-x86_64-0.13.0.tar.xz && \
-  mv zig-linux-x86_64-0.13.0 /usr/local/zig && \
-  rm zig-linux-x86_64-0.13.0.tar.xz && \
-  ln -s /usr/local/zig/zig /usr/local/bin/zig && \
-  zig version
+# RUN wget https://ziglang.org/download/0.13.0/zig-linux-x86_64-0.13.0.tar.xz && \
+#   tar -xf zig-linux-x86_64-0.13.0.tar.xz && \
+#   mv zig-linux-x86_64-0.13.0 /usr/local/zig && \
+#   rm zig-linux-x86_64-0.13.0.tar.xz && \
+#   ln -s /usr/local/zig/zig /usr/local/bin/zig && \
+#   zig version
 
 RUN apt-get install -y --no-install-recommends ca-certificates
 
@@ -27,7 +27,7 @@ RUN npm ci
 RUN go version
 RUN go mod tidy
 COPY . .
-RUN make -f bundle.mk build
+RUN make -f Makefile build
 
 FROM scratch
 WORKDIR /app
