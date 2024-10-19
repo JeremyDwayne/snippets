@@ -15,16 +15,18 @@ func (app *application) routes() http.Handler {
 	mux.Handle("/static", http.NotFoundHandler())
 	mux.Handle("GET /static/", http.StripPrefix("/static", fileServer))
 
+	dynamicMiddleware := alice.New(app.sessionManager.LoadAndSave)
+
 	// Root
-	mux.HandleFunc("GET /{$}", app.home)
+	mux.Handle("GET /{$}", dynamicMiddleware.ThenFunc(app.home))
 
 	// Snippets Routes
-	mux.HandleFunc("GET /snippet/view/{id}", app.getSnippetView)
-	mux.HandleFunc("GET /snippet/create", app.getSnippetCreate)
-	mux.HandleFunc("POST /snippet/create", app.postSnippetCreate)
+	mux.Handle("GET /snippet/view/{id}", dynamicMiddleware.ThenFunc(app.getSnippetView))
+	mux.Handle("GET /snippet/create", dynamicMiddleware.ThenFunc(app.getSnippetCreate))
+	mux.Handle("POST /snippet/create", dynamicMiddleware.ThenFunc(app.postSnippetCreate))
 
-	middleware := alice.New(app.recoverPanic, app.logRequest, commonHeaders)
-	return middleware.Then(mux)
+	standardMiddleware := alice.New(app.recoverPanic, app.logRequest, commonHeaders)
+	return standardMiddleware.Then(mux)
 }
 
 type staticFileSystem struct {
