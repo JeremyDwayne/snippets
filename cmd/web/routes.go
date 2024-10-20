@@ -22,15 +22,18 @@ func (app *application) routes() http.Handler {
 
 	// Snippets Routes
 	mux.Handle("GET /snippet/view/{id}", dynamicMiddleware.ThenFunc(app.getSnippetView))
-	mux.Handle("GET /snippet/create", dynamicMiddleware.ThenFunc(app.getSnippetCreate))
-	mux.Handle("POST /snippet/create", dynamicMiddleware.ThenFunc(app.postSnippetCreate))
 
 	// User Auth
 	mux.Handle("GET /user/signup", dynamicMiddleware.ThenFunc(app.getUserSignup))
 	mux.Handle("POST /user/signup", dynamicMiddleware.ThenFunc(app.postUserSignup))
 	mux.Handle("GET /user/login", dynamicMiddleware.ThenFunc(app.getUserLogin))
 	mux.Handle("POST /user/login", dynamicMiddleware.ThenFunc(app.postUserLogin))
-	mux.Handle("POST /user/logout", dynamicMiddleware.ThenFunc(app.postUserLogout))
+
+	// Require Authentication
+	protectedMiddleware := dynamicMiddleware.Append(app.requireAuthentication)
+	mux.Handle("GET /snippet/create", protectedMiddleware.ThenFunc(app.getSnippetCreate))
+	mux.Handle("POST /snippet/create", protectedMiddleware.ThenFunc(app.postSnippetCreate))
+	mux.Handle("POST /user/logout", protectedMiddleware.ThenFunc(app.postUserLogout))
 
 	standardMiddleware := alice.New(app.recoverPanic, app.logRequest, commonHeaders)
 	return standardMiddleware.Then(mux)

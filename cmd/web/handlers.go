@@ -143,7 +143,7 @@ func (app *application) postUserSignup(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	return
+	http.Redirect(w, r, "/user/login", http.StatusSeeOther)
 }
 
 type userLoginForm struct {
