@@ -14,6 +14,7 @@ require (
 	github.com/go-logfmt/logfmt v0.6.0 // indirect
 	github.com/go-playground/form/v4 v4.2.1 // indirect
 	github.com/justinas/alice v1.2.0 // indirect
+	github.com/justinas/nosurf v1.1.1 // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
 	github.com/mattn/go-isatty v0.0.18 // indirect
 	github.com/mattn/go-runewidth v0.0.15 // indirect
