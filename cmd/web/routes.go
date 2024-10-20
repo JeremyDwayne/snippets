@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"path/filepath"
 
+	"github.com/jeremydwayne/snippets/ui"
 	"github.com/justinas/alice"
 )
 
@@ -11,11 +12,10 @@ func (app *application) routes() http.Handler {
 	mux := http.NewServeMux()
 
 	// Static Files
-	fileServer := http.FileServer(staticFileSystem{http.Dir("./ui/static/")})
 	mux.Handle("/static", http.NotFoundHandler())
-	mux.Handle("GET /static/", http.StripPrefix("/static", fileServer))
+	mux.Handle("GET /static/", http.FileServerFS(ui.Files))
 
-	dynamicMiddleware := alice.New(app.sessionManager.LoadAndSave, noSurf)
+	dynamicMiddleware := alice.New(app.sessionManager.LoadAndSave, noSurf, app.authenticate)
 
 	// Root
 	mux.Handle("GET /{$}", dynamicMiddleware.ThenFunc(app.home))
