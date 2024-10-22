@@ -15,6 +15,8 @@ func (app *application) routes() http.Handler {
 	mux.Handle("/static", http.NotFoundHandler())
 	mux.Handle("GET /static/", http.FileServerFS(ui.Files))
 
+	mux.HandleFunc("GET /ping", ping)
+
 	dynamicMiddleware := alice.New(app.sessionManager.LoadAndSave, noSurf, app.authenticate)
 
 	// Root
