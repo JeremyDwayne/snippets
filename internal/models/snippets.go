@@ -26,7 +26,7 @@ type SnippetModelInterface interface {
 
 func (m *SnippetModel) Insert(title string, content string, expires int) (int, error) {
 	query := `INSERT INTO snippets (title, content, created, expires)
-            VALUES(?, ?, UTC_TIMESTAMP(), DATE_ADD(UTC_TIMESTAMP(), INTERVAL ? DAY))`
+            VALUES(?, ?, DATETIME('now', 'utc'), DATETIME('now', 'utc', '+' || ? || ' days'))`
 
 	result, err := m.DB.Exec(query, title, content, expires)
 	if err != nil {
@@ -45,7 +45,7 @@ func (m *SnippetModel) Get(id int) (Snippet, error) {
 	var s Snippet
 	query := `SELECT id, title, content, created, expires
             FROM snippets
-            WHERE expires > UTC_TIMESTAMP() AND id = ?`
+            WHERE expires > DATETIME('now', 'utc') AND id = ?`
 
 	err := m.DB.QueryRow(query, id).Scan(&s.ID, &s.Title, &s.Content, &s.Created, &s.Expires)
 	if err != nil {
@@ -62,7 +62,7 @@ func (m *SnippetModel) Get(id int) (Snippet, error) {
 func (m *SnippetModel) Latest() ([]Snippet, error) {
 	query := `SELECT id, title, content, created, expires
             FROM snippets
-            WHERE expires > UTC_TIMESTAMP() ORDER BY id DESC LIMIT 10`
+            WHERE expires > DATETIME('now', 'utc') ORDER BY id DESC LIMIT 10`
 
 	rows, err := m.DB.Query(query)
 	if err != nil {

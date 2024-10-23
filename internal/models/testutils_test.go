@@ -7,7 +7,7 @@ import (
 )
 
 func newTestDB(t *testing.T) *sql.DB {
-	db, err := sql.Open("mysql", "test_web:pass@/test_snippets?parseTime=true&multiStatements=true")
+	db, err := sql.Open("sqlite3", "file:./test.db")
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -8,12 +8,12 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/alexedwards/scs/mysqlstore"
+	"github.com/alexedwards/scs/sqlite3store"
 	"github.com/alexedwards/scs/v2"
 	"github.com/charmbracelet/log"
 	"github.com/go-playground/form/v4"
-	_ "github.com/go-sql-driver/mysql"
 	"github.com/jeremydwayne/snippets/internal/models"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 type application struct {
@@ -30,7 +30,8 @@ func main() {
 		ReportTimestamp: true,
 	})
 
-	db, err := openDB(os.Getenv("DATABASE_URL"))
+	dbName := "file:./local.db"
+	db, err := openDB(dbName, os.Getenv("TURSO_DATABASE_URL"), os.Getenv("TURSO_AUTH_TOKEN"))
 	if err != nil {
 		log.Error(err.Error())
 		os.Exit(1)
@@ -46,7 +47,7 @@ func main() {
 	formDecoder := form.NewDecoder()
 
 	sessionManager := scs.New()
-	sessionManager.Store = mysqlstore.New(db)
+	sessionManager.Store = sqlite3store.New(db)
 	sessionManager.Lifetime = 12 * time.Hour
 
 	app := &application{
@@ -83,8 +84,8 @@ func main() {
 	os.Exit(1)
 }
 
-func openDB(dsn string) (*sql.DB, error) {
-	db, err := sql.Open("mysql", dsn)
+func openDB(dbName string, primaryUrl string, authToken string) (*sql.DB, error) {
+	db, err := sql.Open("sqlite3", dbName)
 	if err != nil {
 		return nil, err
 	}

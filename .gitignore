@@ -7,3 +7,5 @@ tmp
 .env
 app_db
 tls
+local.db
+test.db
