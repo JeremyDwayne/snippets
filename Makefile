@@ -5,18 +5,6 @@ ifneq (,$(wildcard ./.env))
 endif
 
 MAIN_PATH = tmp/main
-SYNC_ASSETS_COMMAND =	@go run github.com/air-verse/air@latest \
-											--build.cmd "templ generate --notify-proxy" \
-											--build.bin "true" \
-											--build.delay "100" \
-											--build.exclude_dir "" \
-											--build.include_dir "public" \
-											--build.include_ext "js,css" \
-											--screen.clear_on_rebuild true \
-											--log.main_only true
-
-templ:
-	@templ generate --watch --proxy="http://localhost$(HTTP_LISTEN_ADDR)" --open-browser=false
 
 server:
 	@go run github.com/air-verse/air@latest \
@@ -29,20 +17,16 @@ server:
 	--log.main_only true
 
 watch-assets:
-	@npx tailwindcss -i ui/static/main.css -o public/assets/style.css --watch
+	@npx tailwindcss -i ui/static/css/custom.css -o ui/static/css/style.css --watch
 
 watch-esbuild:
-	@npx esbuild ui/static/index.js --bundle --outdir=public/assets --watch
-
-sync_assets:
-	${SYNC_ASSETS_COMMAND}
+	@npx esbuild ui/static/js/custom.js --bundle --outfile=ui/static/js/index.js --watch
 
 dev:
-	@make -j5 server
-	# @make -j5 templ server watch-assets watch-esbuild sync_assets
+	@make -j5 server watch-assets watch-esbuild
 
 build:
-	# @npx tailwindcss -i ui/static/css/main.css -o public/assets/style.css
-	# @npx esbuild ui/static/index.js --bundle --outdir=public/assets
-	@go build -o bin/app_prod ./cmd/web/
-	@echo "compiled you application with all its assets to a single binary => bin/app_prod"
+	@npx tailwindcss -i ui/static/css/custom.css -o ui/static/css/style.css
+	@npx esbuild ui/static/js/custom.js --bundle --outfile=ui/static/js/index.js
+	@go build -o bin/snippets ./cmd/web/
+	@echo "compiled you application with all its assets to a single binary => bin/snippets"

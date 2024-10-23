@@ -5,8 +5,8 @@
   "main": "tailwind.config.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "watch": "tailwindcss build -i ui/static/css/main.css -o ui/static/css/style.css --watch",
-    "build": "tailwindcss build -i ui/static/css/main.css -o ui/static/css/style.min.css --minify"
+    "watch": "tailwindcss build -i ui/static/css/custom.css -o ui/static/css/style.css --watch",
+    "build": "tailwindcss build -i ui/static/css/custom.css -o ui/static/css/style.min.css --minify"
   },
   "author": "Jeremy Winterberg",
   "license": "ISC",

@@ -1,7 +1,7 @@
 import { fontFamily } from "tailwindcss/defaultTheme";
 
 module.exports = {
-  content: ["./**/*.html", "./**/*.templ", "./**/*.go"],
+  content: ["./**/*.html", "./**/*.templ", "./**/*.tmpl", "./**/*.go"],
   safelist: [],
   theme: {
     container: {

@@ -6,8 +6,7 @@ TAGS='static,osuergo,netgo'
 EXTLDFLAGS="-static -Oz -s"
 LDFLAGS='-linkmode=external -extldflags $(EXTLDFLAGS)'
 build:
-	# @npm run build
-	# @templ generate
-	@go build -tags $(TAGS) -ldflags $(LDFLAGS) -o bin/app_prod ./cmd/web/
-	@upx bin/app_prod
-	@echo "compiled you application with all its assets to a single binary => bin/app_prod"
+	@npm run build
+	@go build -tags $(TAGS) -ldflags $(LDFLAGS) -o bin/web ./cmd/web/
+	@upx bin/web
+	@echo "compiled you application with all its assets to a single binary => bin/web"
