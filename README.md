@@ -6,8 +6,9 @@ Original project from the book ["Let's Go" by Alex Edwards](https://lets-go.alex
 
 - [x] Add tailwindcss
 - [x] Convert to SQLite
+- [ ] Investigate sqlc.dev
 - [ ] Connect to Turso - maybe.. we'll see.. I might just keep it simple with a local file
-- [ ] Add database migrations
+- [x] Add database migrations golang-migrate/migrate
 - [ ] Add HTMX
 - [ ] Maybe convert from html/template to templ? probably not though
 - [ ] Fix Dockerfile and deploy with Kamal
