@@ -15,17 +15,17 @@ func (m *UserModel) Insert(name, email, password string) error {
 	}
 }
 
-func (m *UserModel) Authenticate(email, password string) (int, error) {
+func (m *UserModel) Authenticate(email, password string) (string, error) {
 	if email == "alice@example.com" && password == "pa$$word" {
-		return 1, nil
+		return "e30fd85a-efd2-44d0-86ed-88e71a8dfeda", nil
 	}
 
-	return 0, models.ErrInvalidCredentials
+	return "", models.ErrInvalidCredentials
 }
 
-func (m *UserModel) Exists(id int) (bool, error) {
+func (m *UserModel) Exists(id string) (bool, error) {
 	switch id {
-	case 1:
+	case "e30fd85a-efd2-44d0-86ed-88e71a8dfeda":
 		return true, nil
 	default:
 		return false, nil

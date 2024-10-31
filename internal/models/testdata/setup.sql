@@ -1,5 +1,5 @@
 CREATE TABLE snippets (
-    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    id TEXT NOT NULL PRIMARY KEY,
     title TEXT NOT NULL,
     content TEXT NOT NULL,
     created DATETIME NOT NULL,
@@ -9,16 +9,15 @@ CREATE TABLE snippets (
 CREATE INDEX idx_snippets_created ON snippets(created);
 
 CREATE TABLE users (
-    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    id TEXT NOT NULL PRIMARY KEY,
     name TEXT NOT NULL,
-    email TEXT NOT NULL,
-    hashed_password CHAR(60) NOT NULL,
+    email TEXT NOT NULL UNIQUE,
+    hashed_password TEXT NOT NULL,
     created DATETIME NOT NULL
 );
 
-ALTER TABLE users ADD CONSTRAINT users_uc_email UNIQUE (email);
-
-INSERT INTO users (name, email, hashed_password, created) VALUES (
+INSERT INTO users (id, name, email, hashed_password, created) VALUES (
+    'e30fd85a-efd2-44d0-86ed-88e71a8dfeda',
     'Alice Jones',
     'alice@example.com',
     '$2a$12$NuTjWXm3KKntReFwyBVHyuf/to.HEwTy.eS206TNfkGfr6HzGJSWG',

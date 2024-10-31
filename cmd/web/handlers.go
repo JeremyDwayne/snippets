@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"strconv"
 
 	"github.com/jeremydwayne/snippets/internal/models"
 	"github.com/jeremydwayne/snippets/internal/validator"
@@ -24,8 +23,8 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) getSnippetView(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.Atoi(r.PathValue("id"))
-	if err != nil || id < 1 {
+	id := r.PathValue("id")
+	if id == "" {
 		http.NotFound(w, r)
 		return
 	}
@@ -92,7 +91,7 @@ func (app *application) postSnippetCreate(w http.ResponseWriter, r *http.Request
 
 	app.sessionManager.Put(r.Context(), "flash", "Snippet sucessfully created!")
 
-	http.Redirect(w, r, fmt.Sprintf("/snippet/view/%d", id), http.StatusSeeOther)
+	http.Redirect(w, r, fmt.Sprintf("/snippet/view/%s", id), http.StatusSeeOther)
 }
 
 type userSignupForm struct {

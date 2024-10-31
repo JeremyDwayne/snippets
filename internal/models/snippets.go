@@ -4,10 +4,12 @@ import (
 	"database/sql"
 	"errors"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type Snippet struct {
-	ID      int
+	ID      string
 	Title   string
 	Content string
 	Created time.Time
@@ -19,29 +21,25 @@ type SnippetModel struct {
 }
 
 type SnippetModelInterface interface {
-	Insert(title string, content string, expires int) (int, error)
-	Get(id int) (Snippet, error)
+	Insert(title string, content string, expires int) (string, error)
+	Get(id string) (Snippet, error)
 	Latest() ([]Snippet, error)
 }
 
-func (m *SnippetModel) Insert(title string, content string, expires int) (int, error) {
-	query := `INSERT INTO snippets (title, content, created, expires)
-            VALUES(?, ?, DATETIME('now', 'utc'), DATETIME('now', 'utc', '+' || ? || ' days'))`
+func (m *SnippetModel) Insert(title string, content string, expires int) (string, error) {
+	query := `INSERT INTO snippets (id, title, content, created, expires)
+            VALUES(?, ?, ?, DATETIME('now', 'utc'), DATETIME('now', 'utc', '+' || ? || ' days'))`
+	id := uuid.New().String()
 
-	result, err := m.DB.Exec(query, title, content, expires)
+	_, err := m.DB.Exec(query, id, title, content, expires)
 	if err != nil {
-		return 0, err
+		return "", err
 	}
 
-	id, err := result.LastInsertId()
-	if err != nil {
-		return 0, err
-	}
-
-	return int(id), nil
+	return id, nil
 }
 
-func (m *SnippetModel) Get(id int) (Snippet, error) {
+func (m *SnippetModel) Get(id string) (Snippet, error) {
 	var s Snippet
 	query := `SELECT id, title, content, created, expires
             FROM snippets

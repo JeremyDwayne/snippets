@@ -13,22 +13,22 @@ func TestUserModelExists(t *testing.T) {
 
 	tests := []struct {
 		name   string
-		userID int
+		userID string
 		want   bool
 	}{
 		{
 			name:   "Valid ID",
-			userID: 1,
+			userID: "e30fd85a-efd2-44d0-86ed-88e71a8dfeda",
 			want:   true,
 		},
 		{
 			name:   "Zero ID",
-			userID: 0,
+			userID: "",
 			want:   false,
 		},
 		{
 			name:   "Non-Existent ID",
-			userID: 2,
+			userID: "b30fd85a-efd2-44d0-86ed-88e71a8dfeda",
 			want:   false,
 		},
 	}

@@ -34,7 +34,7 @@ func TestSnippetView(t *testing.T) {
 	}{
 		{
 			name:     "Valid ID",
-			urlPath:  "/snippet/view/1",
+			urlPath:  "/snippet/view/44bfa272-d0b4-4b09-966f-eae71ddaf304",
 			wantCode: http.StatusOK,
 			wantBody: "An old silent pond...",
 		},
@@ -51,11 +51,6 @@ func TestSnippetView(t *testing.T) {
 		{
 			name:     "Decimal ID",
 			urlPath:  "/snippet/view/1.23",
-			wantCode: http.StatusNotFound,
-		},
-		{
-			name:     "String ID",
-			urlPath:  "/snippet/view/foo",
 			wantCode: http.StatusNotFound,
 		},
 		{
