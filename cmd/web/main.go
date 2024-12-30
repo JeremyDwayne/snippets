@@ -16,7 +16,7 @@ import (
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/sqlite3"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
-	db "github.com/jeremydwayne/snippets/db/sqlc"
+	"github.com/jeremydwayne/snippets/db/sqlc"
 	"github.com/jeremydwayne/snippets/internal/models"
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -35,12 +35,12 @@ func main() {
 		ReportTimestamp: true,
 	})
 
-	database, err := openDB(os.Getenv("DATABASE_URL"))
+	db, err := openDB(os.Getenv("DATABASE_URL"))
 	if err != nil {
 		log.Error(err.Error())
 		os.Exit(1)
 	}
-	defer database.Close()
+	defer db.Close()
 
 	templateCache, err := newTemplateCache()
 	if err != nil {
@@ -51,10 +51,10 @@ func main() {
 	formDecoder := form.NewDecoder()
 
 	sessionManager := scs.New()
-	sessionManager.Store = sqlite3store.New(database)
+	sessionManager.Store = sqlite3store.New(db)
 	sessionManager.Lifetime = 12 * time.Hour
 
-	queries := db.New(database)
+	queries := sqlc.New(db)
 
 	app := &application{
 		logger:         logger,
@@ -125,16 +125,16 @@ func openDB(dbName string) (*sql.DB, error) {
 		log.Info("Migrations run")
 	}
 
-	database, err := sql.Open("sqlite3", dbName)
+	db, err := sql.Open("sqlite3", dbName)
 	if err != nil {
 		return nil, err
 	}
 
-	err = database.Ping()
+	err = db.Ping()
 	if err != nil {
-		database.Close()
+		db.Close()
 		return nil, err
 	}
 
-	return database, nil
+	return db, nil
 }
