@@ -1,23 +1,25 @@
 package models
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/jeremydwayne/snippets/db/sqlc"
 )
 
 type Snippet struct {
-	ID      string
-	Title   string
-	Content string
-	Created time.Time
-	Expires time.Time
+	ID      string    `json:"id"`
+	Title   string    `json:"title"`
+	Content string    `json:"content"`
+	Created time.Time `json:"created"`
+	Expires time.Time `json:"expires"`
 }
 
 type SnippetModel struct {
-	DB *sql.DB
+	DB *sqlc.Queries
 }
 
 type SnippetModelInterface interface {
@@ -27,11 +29,17 @@ type SnippetModelInterface interface {
 }
 
 func (m *SnippetModel) Insert(title string, content string, expires int) (string, error) {
-	query := `INSERT INTO snippets (id, title, content, created, expires)
-            VALUES(?, ?, ?, DATETIME('now', 'utc'), DATETIME('now', 'utc', '+' || ? || ' days'))`
 	id := uuid.New().String()
 
-	_, err := m.DB.Exec(query, id, title, content, expires)
+	expire := time.Now().UTC().AddDate(0, 0, expires)
+	params := sqlc.CreateSnippetParams{
+		ID:      id,
+		Title:   title,
+		Content: content,
+		Expires: expire,
+	}
+
+	err := m.DB.CreateSnippet(context.Background(), params)
 	if err != nil {
 		return "", err
 	}
@@ -40,12 +48,7 @@ func (m *SnippetModel) Insert(title string, content string, expires int) (string
 }
 
 func (m *SnippetModel) Get(id string) (Snippet, error) {
-	var s Snippet
-	query := `SELECT id, title, content, created, expires
-            FROM snippets
-            WHERE expires > DATETIME('now', 'utc') AND id = ?`
-
-	err := m.DB.QueryRow(query, id).Scan(&s.ID, &s.Title, &s.Content, &s.Created, &s.Expires)
+	s, err := m.DB.GetSnippet(context.Background(), id)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return Snippet{}, ErrNoRecord
@@ -53,38 +56,38 @@ func (m *SnippetModel) Get(id string) (Snippet, error) {
 			return Snippet{}, err
 		}
 	}
+	snippet := Snippet{
+		ID:      s.ID,
+		Title:   s.Title,
+		Content: s.Content,
+		Created: s.Created,
+		Expires: s.Expires,
+	}
 
-	return s, nil
+	return snippet, nil
 }
 
 func (m *SnippetModel) Latest() ([]Snippet, error) {
-	query := `SELECT id, title, content, created, expires
-            FROM snippets
-            WHERE expires > DATETIME('now', 'utc') ORDER BY id DESC LIMIT 10`
-
-	rows, err := m.DB.Query(query)
+	rows, err := m.DB.LatestSnippets(context.Background())
 	if err != nil {
 		return nil, err
 	}
 
-	defer rows.Close()
-
 	var snippets []Snippet
 
-	for rows.Next() {
-		var s Snippet
-
-		err = rows.Scan(&s.ID, &s.Title, &s.Content, &s.Created, &s.Expires)
-		if err != nil {
-			return nil, err
-		}
-
-		snippets = append(snippets, s)
-	}
-
-	if err = rows.Err(); err != nil {
-		return nil, err
+	for _, row := range rows {
+		snippets = append(snippets, convertSnippet(row))
 	}
 
 	return snippets, nil
+}
+
+func convertSnippet(row sqlc.Snippets) Snippet {
+	return Snippet{
+		ID:      row.ID,
+		Title:   row.Title,
+		Content: row.Content,
+		Created: row.Created,
+		Expires: row.Expires,
+	}
 }

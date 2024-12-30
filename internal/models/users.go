@@ -1,25 +1,27 @@
 package models
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/jeremydwayne/snippets/db/sqlc"
 	"github.com/mattn/go-sqlite3"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type User struct {
-	ID             string
-	Name           string
-	Email          string
-	HashedPassword []byte
-	Created        time.Time
+	ID             string    `json:"id"`
+	Name           string    `json:"name"`
+	Email          string    `json:"email"`
+	HashedPassword []byte    `json:"hashed_password"`
+	Created        time.Time `json:"created"`
 }
 
 type UserModel struct {
-	DB *sql.DB
+	DB *sqlc.Queries
 }
 
 type UserModelInterface interface {
@@ -34,10 +36,15 @@ func (m *UserModel) Insert(name, email, password string) error {
 		return err
 	}
 
-	query := `INSERT INTO users (id, name, email, hashed_password, created)
-            VALUES(?, ?, ?, ?, DATETIME('now', 'utc'))`
 	id := uuid.New().String()
-	_, err = m.DB.Exec(query, id, name, email, string(hashedPassword))
+	params := sqlc.CreateUserParams{
+		ID:             id,
+		Name:           name,
+		Email:          email,
+		HashedPassword: string(hashedPassword),
+	}
+
+	err = m.DB.CreateUser(context.Background(), params)
 	if err != nil {
 		var sqliteError *sqlite3.Error
 		if errors.As(err, &sqliteError) {
@@ -52,12 +59,9 @@ func (m *UserModel) Insert(name, email, password string) error {
 }
 
 func (m *UserModel) Authenticate(email, password string) (string, error) {
-	var id string
-	var hashedPassword []byte
+	var user sqlc.AuthenticateUserRow
 
-	query := "SELECT id, hashed_password FROM users WHERE email = ?"
-
-	err := m.DB.QueryRow(query, email).Scan(&id, &hashedPassword)
+	user, err := m.DB.AuthenticateUser(context.Background(), email)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return "", ErrInvalidCredentials
@@ -66,7 +70,7 @@ func (m *UserModel) Authenticate(email, password string) (string, error) {
 		}
 	}
 
-	err = bcrypt.CompareHashAndPassword(hashedPassword, []byte(password))
+	err = bcrypt.CompareHashAndPassword([]byte(user.HashedPassword), []byte(password))
 	if err != nil {
 		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
 			return "", ErrInvalidCredentials
@@ -75,13 +79,10 @@ func (m *UserModel) Authenticate(email, password string) (string, error) {
 		}
 	}
 
-	return id, nil
+	return user.ID, nil
 }
 
 func (m *UserModel) Exists(id string) (bool, error) {
-	var exists bool
-	query := "SELECT EXISTS(SELECT true FROM users WHERE id = ?)"
-
-	err := m.DB.QueryRow(query, id).Scan(&exists)
-	return exists, err
+	exists, err := m.DB.UserExists(context.Background(), id)
+	return exists != 0, err
 }
