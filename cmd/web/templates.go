@@ -35,9 +35,20 @@ var functions = template.FuncMap{
 func newTemplateCache() (map[string]*template.Template, error) {
 	cache := map[string]*template.Template{}
 
-	pages, err := fs.Glob(ui.Files, "html/pages/*.tmpl")
-	if err != nil {
-		return nil, err
+	// TODO: add a smart way of detecting nested folders in the pages directory
+	// This is a manual way of supporting an organized folder structure for templates
+	patterns := []string{
+		"html/pages/*.tmpl",
+		"html/pages/snippets/*.tmpl",
+	}
+
+	var pages []string
+	for _, pattern := range patterns {
+		files, err := fs.Glob(ui.Files, pattern)
+		if err != nil {
+			return nil, err
+		}
+		pages = append(pages, files...)
 	}
 
 	for _, page := range pages {

@@ -9,6 +9,7 @@
 - [x] SQLC integration
 - [ ] Add HTMX features
 - [ ] Stripe integration
+- [ ] Email sending (SendGrid, Mailgun)
 - [ ] Fix Dockerfile and deploy with Kamal
 - [ ] Connect to Turso - maybe.. we'll see.. I might just keep it simple with a local file
 - [ ] Make a new repo template for future projects
