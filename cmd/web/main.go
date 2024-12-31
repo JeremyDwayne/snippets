@@ -2,8 +2,6 @@ package main
 
 import (
 	"crypto/tls"
-	"database/sql"
-	"fmt"
 	"net/http"
 	"os"
 	"text/template"
@@ -13,7 +11,6 @@ import (
 	"github.com/alexedwards/scs/v2"
 	"github.com/charmbracelet/log"
 	"github.com/go-playground/form/v4"
-	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/sqlite3"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/jeremydwayne/snippets/db/sqlc"
@@ -88,53 +85,4 @@ func main() {
 	err = srv.ListenAndServe()
 	logger.Error(err.Error())
 	os.Exit(1)
-}
-
-func openDB(dbName string) (*sql.DB, error) {
-	dbUrl := fmt.Sprintf("sqlite3://%s", dbName)
-	log.Info(dbUrl)
-	migrator, err := migrate.New("file://db/migrations", dbUrl)
-	if err != nil {
-		return nil, err
-	}
-
-	dbVersion, dbDirty, err := migrator.Version()
-	if err == migrate.ErrNilVersion {
-		log.Info("Inintializing Database")
-	} else if err != nil {
-		log.Fatal(err)
-	}
-
-	if dbDirty {
-		dbForceVersion := dbVersion - 1
-		log.Info("Database is dirty, forcing version", "version", dbForceVersion)
-		err = migrator.Force(int(dbForceVersion))
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
-
-	log.Info("Database at version", "version", dbVersion)
-
-	err = migrator.Up()
-	if err == migrate.ErrNoChange {
-		log.Info("No new migrations")
-	} else if err != nil {
-		log.Fatal(err)
-	} else {
-		log.Info("Migrations run")
-	}
-
-	db, err := sql.Open("sqlite3", dbName)
-	if err != nil {
-		return nil, err
-	}
-
-	err = db.Ping()
-	if err != nil {
-		db.Close()
-		return nil, err
-	}
-
-	return db, nil
 }
