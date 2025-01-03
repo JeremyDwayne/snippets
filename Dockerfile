@@ -6,15 +6,14 @@ RUN apt-get update -qq && \
 RUN curl -fsSL https://deb.nodesource.com/setup_current.x | bash - && \
   apt-get install -y nodejs \
   build-essential && \
-  node --version && \ 
+  node --version && \
   npm --version
 
 RUN apt-get install -y --no-install-recommends ca-certificates
 
 COPY go.mod go.sum package-lock.json package.json ./
 RUN npm ci
-RUN go version
-RUN go mod tidy
+RUN go mod download
 COPY . .
 RUN make -f Makefile build
 
@@ -24,4 +23,4 @@ WORKDIR /app
 COPY --from=builder /app/bin .
 COPY --from=builder /app/ui ./ui
 EXPOSE 3000
-CMD [ "/app/bin/snippets" ]
+CMD [ "/app/snippets" ]
