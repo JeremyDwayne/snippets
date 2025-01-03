@@ -10,4 +10,4 @@ WHERE expires > DATETIME('now', 'utc') AND id = ?;
 -- name: LatestSnippets :many
 SELECT *
 FROM snippets
-WHERE expires > DATETIME('now', 'utc') ORDER BY id DESC LIMIT 10;
+WHERE expires > DATETIME('now', 'utc') ORDER BY created DESC LIMIT 10;
