@@ -24,4 +24,4 @@ WORKDIR /app
 COPY --from=builder /app/bin .
 COPY --from=builder /app/ui ./ui
 EXPOSE 3000
-CMD [ "/snippets" ]
+CMD [ "/app/bin/snippets" ]
