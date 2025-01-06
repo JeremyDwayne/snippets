@@ -10,7 +10,7 @@
 - [ ] Add HTMX features
 - [ ] Stripe integration
 - [ ] Email sending (SendGrid, Mailgun)
-- [ ] Fix Dockerfile and deploy with Kamal
+- [x] Fix Dockerfile and deploys
 - [ ] Connect to Turso - maybe.. we'll see.. I might just keep it simple with a local file
 - [ ] Make a new repo template for future projects
   - [ ] Generalize the project to be a starting point for new go web apps
