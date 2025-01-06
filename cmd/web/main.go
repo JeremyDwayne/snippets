@@ -2,6 +2,7 @@ package main
 
 import (
 	"crypto/tls"
+	"fmt"
 	"net/http"
 	"os"
 	"text/template"
@@ -71,7 +72,7 @@ func main() {
 	}
 
 	srv := &http.Server{
-		Addr:         os.Getenv("HTTP_LISTEN_ADDR"),
+		Addr:         fmt.Sprintf(":%s", os.Getenv("PORT")),
 		Handler:      app.routes(),
 		ErrorLog:     stdlog,
 		TLSConfig:    tlsConfig,

@@ -5,6 +5,7 @@ bin
 node_modules
 tmp
 .env
+.envrc
 app_db
 tls
 local.db

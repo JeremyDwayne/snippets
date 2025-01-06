@@ -3,8 +3,7 @@ RUN apk add --no-cache curl nodejs npm bash upx alpine-sdk
 
 WORKDIR /app
 
-RUN node --version && \
-  npm --version
+RUN node --version && npm --version
 
 # RUN go install github.com/a-h/templ/cmd/templ@latest
 
@@ -13,8 +12,6 @@ RUN npm ci
 RUN go mod download
 
 COPY . .
-
-# RUN make -f Makefile build
 
 RUN npx tailwindcss -i ui/static/css/custom.css -o ui/static/css/style.css
 RUN npx esbuild ui/static/js/custom.js --bundle --outfile=ui/static/js/index.js
