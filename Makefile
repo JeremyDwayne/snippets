@@ -28,5 +28,6 @@ dev:
 build:
 	@npx tailwindcss -i ui/static/css/custom.css -o ui/static/css/style.css
 	@npx esbuild ui/static/js/custom.js --bundle --outfile=ui/static/js/index.js
-	@go build -o bin/snippets ./cmd/web/
-	@echo "compiled you application with all its assets to a single binary => bin/snippets"
+	@go build -o bin/app_prod cmd/web/main.go
+	@upx bin/app_prod
+	@echo "compiled you application with all its assets to a single binary => bin/app_prod"
