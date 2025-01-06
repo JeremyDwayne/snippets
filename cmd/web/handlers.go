@@ -1,10 +1,14 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
+	"time"
 
+	"github.com/etherlabsio/healthcheck/v2"
+	"github.com/etherlabsio/healthcheck/v2/checkers"
 	"github.com/jeremydwayne/snippets/internal/models"
 	"github.com/jeremydwayne/snippets/internal/validator"
 )
@@ -214,4 +218,30 @@ func (app *application) postUserLogout(w http.ResponseWriter, r *http.Request) {
 
 func ping(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("OK"))
+}
+
+func (app *application) health() http.Handler {
+	return healthcheck.Handler(
+
+		// WithTimeout allows you to set a max overall timeout.
+		healthcheck.WithTimeout(5*time.Second),
+
+		// Checkers fail the status in case of any error.
+		healthcheck.WithChecker(
+			"heartbeat", checkers.Heartbeat("./heartbeat"),
+		),
+
+		healthcheck.WithChecker(
+			"database", healthcheck.CheckerFunc(
+				func(ctx context.Context) error {
+					return app.db.Ping()
+				},
+			),
+		),
+
+		// Observers do not fail the status in case of error.
+		healthcheck.WithObserver(
+			"diskspace", checkers.DiskSpace("/var/log", 90),
+		),
+	)
 }

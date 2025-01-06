@@ -2,6 +2,7 @@ package main
 
 import (
 	"crypto/tls"
+	"database/sql"
 	"fmt"
 	"net/http"
 	"os"
@@ -21,6 +22,7 @@ import (
 
 type application struct {
 	logger         *log.Logger
+	db             *sql.DB
 	snippets       models.SnippetModelInterface
 	users          models.UserModelInterface
 	templateCache  map[string]*template.Template
@@ -56,6 +58,7 @@ func main() {
 
 	app := &application{
 		logger:         logger,
+		db:             db,
 		snippets:       &models.SnippetModel{DB: queries},
 		users:          &models.UserModel{DB: queries},
 		templateCache:  templateCache,
