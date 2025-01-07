@@ -9,15 +9,12 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/alexedwards/scs/sqlite3store"
 	"github.com/alexedwards/scs/v2"
 	"github.com/charmbracelet/log"
 	"github.com/go-playground/form/v4"
-	_ "github.com/golang-migrate/migrate/v4/database/sqlite3"
-	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/jeremydwayne/snippets/db/sqlc"
+	"github.com/jeremydwayne/snippets/internal/libsqlstore"
 	"github.com/jeremydwayne/snippets/internal/models"
-	_ "github.com/mattn/go-sqlite3"
 )
 
 type application struct {
@@ -35,12 +32,11 @@ func main() {
 		ReportTimestamp: true,
 	})
 
-	db, err := openDB(os.Getenv("DATABASE_URL"))
+	db, err := openDB()
 	if err != nil {
 		log.Error(err.Error())
 		os.Exit(1)
 	}
-	defer db.Close()
 
 	templateCache, err := newTemplateCache()
 	if err != nil {
@@ -51,7 +47,7 @@ func main() {
 	formDecoder := form.NewDecoder()
 
 	sessionManager := scs.New()
-	sessionManager.Store = sqlite3store.New(db)
+	sessionManager.Store = libsqlstore.New(db)
 	sessionManager.Lifetime = 12 * time.Hour
 
 	queries := sqlc.New(db)

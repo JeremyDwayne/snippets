@@ -4,11 +4,11 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/jeremydwayne/snippets/db/sqlc"
-	"github.com/mattn/go-sqlite3"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -46,11 +46,8 @@ func (m *UserModel) Insert(name, email, password string) error {
 
 	err = m.DB.CreateUser(context.Background(), params)
 	if err != nil {
-		var sqliteError *sqlite3.Error
-		if errors.As(err, &sqliteError) {
-			if sqliteError.ExtendedCode == sqlite3.ErrConstraintUnique {
-				return ErrDuplicateEmail
-			}
+		if strings.Contains(err.Error(), "UNIQUE constraint failed") {
+			return ErrDuplicateEmail
 		}
 		return err
 	}

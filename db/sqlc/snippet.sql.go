@@ -54,7 +54,7 @@ func (q *Queries) GetSnippet(ctx context.Context, id string) (Snippets, error) {
 const latestSnippets = `-- name: LatestSnippets :many
 SELECT id, title, content, expires, created
 FROM snippets
-WHERE expires > DATETIME('now', 'utc') ORDER BY id DESC LIMIT 10
+WHERE expires > DATETIME('now', 'utc') ORDER BY created DESC LIMIT 10
 `
 
 func (q *Queries) LatestSnippets(ctx context.Context) ([]Snippets, error) {
