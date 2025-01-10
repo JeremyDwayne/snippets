@@ -1,3 +1,4 @@
+-- +goose Up
 CREATE TABLE users (
   id TEXT NOT NULL PRIMARY KEY,
   name TEXT NOT NULL,
@@ -5,3 +6,6 @@ CREATE TABLE users (
   hashed_password TEXT NOT NULL,
   created DATETIME NOT NULL
 );
+
+-- +goose Down
+DROP TABLE IF EXISTS users;

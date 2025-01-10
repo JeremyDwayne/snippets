@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/charmbracelet/log"
 	"github.com/etherlabsio/healthcheck/v2"
 	"github.com/etherlabsio/healthcheck/v2/checkers"
 	"github.com/jeremydwayne/snippets/internal/models"
@@ -14,6 +15,7 @@ import (
 )
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
+	log.Info("Handler")
 	snippets, err := app.snippets.Latest()
 	if err != nil {
 		app.serverError(w, r, err)

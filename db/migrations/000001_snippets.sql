@@ -1,3 +1,4 @@
+-- +goose Up
 CREATE TABLE snippets (
   id TEXT NOT NULL PRIMARY KEY,
   title TEXT NOT NULL,
@@ -7,3 +8,6 @@ CREATE TABLE snippets (
 );
 
 CREATE INDEX idx_snippets_created ON snippets (created);
+
+-- +goose Down
+DROP TABLE IF EXISTS snippets;

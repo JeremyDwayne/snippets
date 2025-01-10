@@ -3,8 +3,8 @@ package models
 import (
 	"testing"
 
-	"github.com/jeremydwayne/snippets/db/sqlc"
 	"github.com/jeremydwayne/snippets/internal/assert"
+	"github.com/jeremydwayne/snippets/internal/sqlc"
 )
 
 func TestUserModelExists(t *testing.T) {

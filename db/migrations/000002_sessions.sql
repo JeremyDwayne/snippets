@@ -1,3 +1,4 @@
+-- +goose Up
 CREATE TABLE sessions (
   token TEXT PRIMARY KEY,
   data BLOB NOT NULL,
@@ -5,3 +6,6 @@ CREATE TABLE sessions (
 );
 
 CREATE INDEX sessions_expiry_idx ON sessions (expiry);
+
+-- +goose Down
+DROP TABLE IF EXISTS sessions;

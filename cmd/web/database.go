@@ -5,19 +5,17 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/charmbracelet/log"
-	"github.com/golang-migrate/migrate/v4"
-	_ "github.com/golang-migrate/migrate/v4/source/file" // File source for migrations
-	_ "github.com/jeremydwayne/snippets/internal/libsqlmigrate"
+	"github.com/pressly/goose/v3"
 	"github.com/tursodatabase/go-libsql"
 )
 
 func openDB() (*sql.DB, error) {
-	dbName := "local.db"
+	dbName := "snippets.local.db"
 	primaryUrl := os.Getenv("TURSO_DATABASE_URL")
 	authToken := os.Getenv("TURSO_AUTH_TOKEN")
-	fmt.Println("env vars")
 
 	dir, err := os.MkdirTemp("", "libsql-*")
 	if err != nil {
@@ -25,56 +23,20 @@ func openDB() (*sql.DB, error) {
 		os.Exit(1)
 	}
 	defer os.RemoveAll(dir)
-	fmt.Println("make temp dir")
 
 	dbPath := filepath.Join(dir, dbName)
 
 	connector, err := libsql.NewEmbeddedReplicaConnector(dbPath, primaryUrl,
 		libsql.WithAuthToken(authToken),
+		libsql.WithEncryption(os.Getenv("DATABASE_SECRET")),
+		libsql.WithSyncInterval(time.Minute),
 	)
-	fmt.Println("connector")
-
 	if err != nil {
 		fmt.Println("Error creating connector:", err)
 		os.Exit(1)
 	}
+	fmt.Println("after connector")
 	defer connector.Close()
-
-	// dbUrl := fmt.Sprintf("sqlite3://%s", dbName)
-	// log.Info(dbUrl)
-	fmt.Println("before migrator")
-	migrator, err := migrate.New("file://db/migrations", "libsql://"+primaryUrl+"?authToken="+authToken)
-	if err != nil {
-		return nil, err
-	}
-
-	dbVersion, dbDirty, err := migrator.Version()
-	if err == migrate.ErrNilVersion {
-		log.Info("Inintializing Database")
-	} else if err != nil {
-		log.Fatal(err)
-	}
-
-	if dbDirty {
-		dbForceVersion := dbVersion - 1
-		log.Info("Database is dirty, forcing version", "version", dbForceVersion)
-		err = migrator.Force(int(dbForceVersion))
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
-
-	log.Info("Database at version", "version", dbVersion)
-
-	err = migrator.Up()
-	if err == migrate.ErrNoChange {
-		log.Info("No new migrations")
-	} else if err != nil {
-		log.Info("error")
-		log.Fatal(err)
-	} else {
-		log.Info("Migrations run")
-	}
 
 	log.Info("opendb")
 	db := sql.OpenDB(connector)
@@ -84,6 +46,30 @@ func openDB() (*sql.DB, error) {
 	if err != nil {
 		db.Close()
 		return nil, err
+	}
+
+	fmt.Println("before migrator")
+	migrations := os.DirFS("db/migrations")
+	goose.SetBaseFS(migrations)
+	err = goose.SetDialect("turso")
+	if err != nil {
+		return nil, err
+	}
+
+	err = goose.Version(db, "db/migrations")
+	if err == goose.ErrNoCurrentVersion {
+		log.Info("Inintializing Database")
+	} else if err != nil {
+		log.Fatal(err)
+	}
+
+	err = goose.Up(db, "db/migrations")
+	if err == goose.ErrAlreadyApplied {
+		log.Info("No new migrations")
+	} else if err != nil {
+		log.Fatal(err)
+	} else {
+		log.Info("Migrations ran")
 	}
 
 	return db, nil

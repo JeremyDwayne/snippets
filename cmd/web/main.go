@@ -12,9 +12,9 @@ import (
 	"github.com/alexedwards/scs/v2"
 	"github.com/charmbracelet/log"
 	"github.com/go-playground/form/v4"
-	"github.com/jeremydwayne/snippets/db/sqlc"
 	"github.com/jeremydwayne/snippets/internal/libsqlstore"
 	"github.com/jeremydwayne/snippets/internal/models"
+	"github.com/jeremydwayne/snippets/internal/sqlc"
 )
 
 type application struct {

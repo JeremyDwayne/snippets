@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/jeremydwayne/snippets/db/sqlc"
+	"github.com/jeremydwayne/snippets/internal/sqlc"
 	"golang.org/x/crypto/bcrypt"
 )
 
