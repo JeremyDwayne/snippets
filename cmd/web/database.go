@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"embed"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -11,6 +12,9 @@ import (
 	"github.com/pressly/goose/v3"
 	"github.com/tursodatabase/go-libsql"
 )
+
+//go:embed migrations
+var embeddedFiles embed.FS
 
 func openDB() (*sql.DB, error) {
 	dbName := "snippets.local.db"
@@ -48,22 +52,20 @@ func openDB() (*sql.DB, error) {
 		return nil, err
 	}
 
-	fmt.Println("before migrator")
-	migrations := os.DirFS("db/migrations")
-	goose.SetBaseFS(migrations)
+	goose.SetBaseFS(embeddedFiles)
 	err = goose.SetDialect("turso")
 	if err != nil {
 		return nil, err
 	}
 
-	err = goose.Version(db, "db/migrations")
+	err = goose.Version(db, "migrations")
 	if err == goose.ErrNoCurrentVersion {
 		log.Info("Inintializing Database")
 	} else if err != nil {
 		log.Fatal(err)
 	}
 
-	err = goose.Up(db, "db/migrations")
+	err = goose.Up(db, "migrations")
 	if err == goose.ErrAlreadyApplied {
 		log.Info("No new migrations")
 	} else if err != nil {
