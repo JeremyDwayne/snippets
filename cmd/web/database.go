@@ -44,7 +44,6 @@ func openDB() (*sql.DB, error) {
 
 	log.Info("opendb")
 	db := sql.OpenDB(connector)
-	defer db.Close()
 
 	err = db.Ping()
 	if err != nil {
@@ -55,6 +54,7 @@ func openDB() (*sql.DB, error) {
 	goose.SetBaseFS(embeddedFiles)
 	err = goose.SetDialect("turso")
 	if err != nil {
+		db.Close()
 		return nil, err
 	}
 
@@ -62,14 +62,18 @@ func openDB() (*sql.DB, error) {
 	if err == goose.ErrNoCurrentVersion {
 		log.Info("Inintializing Database")
 	} else if err != nil {
+		db.Close()
 		log.Fatal(err)
+		return nil, err
 	}
 
 	err = goose.Up(db, "migrations")
 	if err == goose.ErrAlreadyApplied {
 		log.Info("No new migrations")
 	} else if err != nil {
+		db.Close()
 		log.Fatal(err)
+		return nil, err
 	} else {
 		log.Info("Migrations ran")
 	}

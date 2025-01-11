@@ -33,6 +33,7 @@ func main() {
 	})
 
 	db, err := openDB()
+	defer db.Close()
 	if err != nil {
 		log.Error(err.Error())
 		os.Exit(1)
