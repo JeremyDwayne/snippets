@@ -3,21 +3,23 @@ package main
 import (
 	"crypto/tls"
 	"database/sql"
+	"embed"
 	"fmt"
 	"net/http"
 	"os"
+	"path/filepath"
 	"text/template"
 	"time"
 
-	"github.com/alexedwards/scs/sqlite3store"
+	// "github.com/alexedwards/scs/sqlite3store"
 	"github.com/alexedwards/scs/v2"
 	"github.com/charmbracelet/log"
 	"github.com/go-playground/form/v4"
-	_ "github.com/golang-migrate/migrate/v4/database/sqlite3"
-	_ "github.com/golang-migrate/migrate/v4/source/file"
-	"github.com/jeremydwayne/snippets/db/sqlc"
+	"github.com/jeremydwayne/snippets/internal/libsqlstore"
 	"github.com/jeremydwayne/snippets/internal/models"
-	_ "github.com/mattn/go-sqlite3"
+	"github.com/jeremydwayne/snippets/internal/sqlc"
+	"github.com/pressly/goose/v3"
+	"github.com/tursodatabase/go-libsql"
 )
 
 type application struct {
@@ -30,17 +32,74 @@ type application struct {
 	sessionManager *scs.SessionManager
 }
 
+//go:embed migrations
+var migrations embed.FS
+
 func main() {
 	logger := log.NewWithOptions(os.Stdout, log.Options{
 		ReportTimestamp: true,
 	})
 
-	db, err := openDB(os.Getenv("DATABASE_URL"))
+	dbName := "snippets.local.db"
+	dbURL := os.Getenv("TURSO_DATABASE_URL")
+	dbAuthToken := os.Getenv("TURSO_AUTH_TOKEN")
+
+	dir, err := os.MkdirTemp("", "libsql-*")
+	if err != nil {
+		log.Error("Error creating temporary directory:", err)
+		os.Exit(1)
+	}
+	defer os.RemoveAll(dir)
+
+	dbPath := filepath.Join(dir, dbName)
+
+	connector, err := libsql.NewEmbeddedReplicaConnector(dbPath, dbURL,
+		libsql.WithAuthToken(dbAuthToken),
+		libsql.WithEncryption(os.Getenv("DATABASE_SECRET")),
+		libsql.WithSyncInterval(time.Minute),
+	)
+	if err != nil {
+		log.Error("Error creating connector:", err)
+		os.Exit(1)
+	}
+	defer connector.Close()
+
+	db := sql.OpenDB(connector)
+	defer db.Close()
+
+	err = db.Ping()
+	if err != nil {
+		db.Close()
+	}
+
+	goose.SetBaseFS(migrations)
+	err = goose.SetDialect("turso")
+	if err != nil {
+		db.Close()
+	}
+
+	err = goose.Version(db, "migrations")
+	if err == goose.ErrNoCurrentVersion {
+		log.Info("Inintializing Database")
+	} else if err != nil {
+		db.Close()
+		log.Fatal(err)
+	}
+
+	err = goose.Up(db, "migrations")
+	if err == goose.ErrAlreadyApplied {
+		log.Info("No new migrations")
+	} else if err != nil {
+		db.Close()
+		log.Fatal(err)
+	} else {
+		log.Info("Migrations ran")
+	}
+
 	if err != nil {
 		log.Error(err.Error())
 		os.Exit(1)
 	}
-	defer db.Close()
 
 	templateCache, err := newTemplateCache()
 	if err != nil {
@@ -51,7 +110,7 @@ func main() {
 	formDecoder := form.NewDecoder()
 
 	sessionManager := scs.New()
-	sessionManager.Store = sqlite3store.New(db)
+	sessionManager.Store = libsqlstore.New(db)
 	sessionManager.Lifetime = 12 * time.Hour
 
 	queries := sqlc.New(db)

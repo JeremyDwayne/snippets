@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/jeremydwayne/snippets/db/sqlc"
+	"github.com/jeremydwayne/snippets/internal/sqlc"
 )
 
 type Snippet struct {

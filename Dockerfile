@@ -19,6 +19,7 @@ RUN CGO_ENABLED=1 GOOS=linux go build -o bin/app_prod ./cmd/web/
 RUN upx bin/app_prod
 
 FROM alpine:3.20.1 AS prod
+RUN apk add --no-cache curl
 WORKDIR /app
 COPY --from=build /app/bin/app_prod /app/app_prod
 COPY --from=build /app/ui /app/ui
