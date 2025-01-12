@@ -1,5 +1,5 @@
-FROM golang:1.23-alpine AS build
-RUN apk add --no-cache curl nodejs npm bash upx alpine-sdk
+FROM golang:latest AS build
+RUN apt update && apt install -y curl nodejs npm bash
 
 WORKDIR /app
 
@@ -15,8 +15,7 @@ COPY . .
 
 RUN npx tailwindcss -i ui/static/css/custom.css -o ui/static/css/style.css
 RUN npx esbuild ui/static/js/custom.js --bundle --outfile=ui/static/js/index.js
-RUN CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o bin/app_prod ./cmd/web/
-RUN upx bin/app_prod
+RUN CGO_ENABLED=1 GOOS=linux go build -ldflags="-s -w" -o bin/app_prod ./cmd/web/
 
 FROM alpine:3.20.1 AS prod
 RUN apk add --no-cache curl
