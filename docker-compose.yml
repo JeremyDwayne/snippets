@@ -11,6 +11,9 @@ services:
       APP_ENV: ${APP_ENV}
       PORT: ${PORT}
       DATABASE_URL: ${DATABASE_URL}
+      DATABASE_SECRET: ${DATABASE_SECRET}
+      TURSO_DATABASE_URL: ${TURSO_DATABASE_URL}
+      TURSO_AUTH_TOKEN: ${TURSO_AUTH_TOKEN}
     volumes:
       - sqlite_bp:/app/db
 volumes:
