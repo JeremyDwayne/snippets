@@ -2,7 +2,7 @@ version: "2"
 cloud:
   project: "01JGCGJZP476007JPTE8AF7NX6"
 sql:
-  - schema: "db/migrations"
+  - schema: "cmd/web/migrations"
     queries: "db/queries"
     engine: "sqlite"
     gen:

@@ -6,13 +6,13 @@ import (
 	"time"
 )
 
-// SQLite3Store represents the session store.
+// LibsqlStore represents the session store.
 type LibsqlStore struct {
 	db          *sql.DB
 	stopCleanup chan bool
 }
 
-// New returns a new SQLite3Store instance, with a background cleanup goroutine
+// New returns a new LibsqlStore instance, with a background cleanup goroutine
 // that runs every 5 minutes to remove expired session data.
 func New(db *sql.DB) *LibsqlStore {
 	return NewWithCleanupInterval(db, 5*time.Minute)
