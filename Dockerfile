@@ -15,7 +15,7 @@ COPY . .
 
 RUN npx tailwindcss -i ui/static/css/custom.css -o ui/static/css/style.css
 RUN npx esbuild ui/static/js/custom.js --bundle --outfile=ui/static/js/index.js
-RUN CGO_ENABLED=1 GOOS=linux go build -o bin/app_prod ./cmd/web/
+RUN CGO_ENABLED=1 go build -o bin/app_prod ./cmd/web/
 RUN upx bin/app_prod
 
 FROM alpine:3.20.1 AS prod
