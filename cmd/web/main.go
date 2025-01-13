@@ -144,8 +144,10 @@ func main() {
 	}
 
 	log.Info("Starting server", "addr", srv.Addr)
+	os.Create("heartbeat")
 
 	err = srv.ListenAndServe()
 	logger.Error(err.Error())
+	os.Remove("heartbeat")
 	os.Exit(1)
 }

@@ -10,3 +10,4 @@ app_db
 tls
 local.db
 test.db
+heartbeat
