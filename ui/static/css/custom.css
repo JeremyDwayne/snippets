@@ -287,14 +287,6 @@ input[type="submit"]:hover {
   text-decoration: none;
 }
 
-form div {
-  margin-bottom: 18px;
-}
-
-form div:last-child {
-  border-top: 1px dashed #e4e5e7;
-}
-
 form input[type="radio"] {
   margin-left: 18px;
 }

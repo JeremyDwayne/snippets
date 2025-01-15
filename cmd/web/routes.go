@@ -15,7 +15,6 @@ func (app *application) routes() http.Handler {
 	mux.Handle("/static", http.NotFoundHandler())
 	mux.Handle("GET /static/", http.FileServerFS(ui.Files))
 
-	// mux.HandleFunc("GET /ping", ping)
 	mux.Handle("GET /healthcheck", app.health())
 
 	dynamicMiddleware := alice.New(app.sessionManager.LoadAndSave, noSurf, app.authenticate)
@@ -24,6 +23,7 @@ func (app *application) routes() http.Handler {
 	mux.Handle("GET /{$}", dynamicMiddleware.ThenFunc(app.home))
 
 	// Snippets Routes
+	mux.Handle("GET /snippets", dynamicMiddleware.ThenFunc(app.getSnippetIndex))
 	mux.Handle("GET /snippet/view/{id}", dynamicMiddleware.ThenFunc(app.getSnippetView))
 
 	// User Auth

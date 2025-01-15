@@ -1,23 +1,60 @@
 {{define "title"}}Home{{end}} 
 
 {{define "main"}}
-  <h2>Latest Snippets</h2>
-  {{if .Snippets}}
-    <table>
-      <tr>
-        <th>Title</th>
-        <th>Created</th>
-        <th>ID</th>
-      </tr>
-      {{range .Snippets}}
-      <tr>
-        <td><a href="/snippet/view/{{.ID}}">{{.Title}}</a></td>
-        <td>{{humanDate .Created}}</td>
-        <td>{{.ID}}</td>
-      </tr>
-      {{end}}
-    </table>
-  {{else}}
-    <p>There's nothing to see here yet!
-  {{end}}
+  
+  <div class="hero">
+    <h1>Become A Safer Pilot By Enhancing Your Aviation Skills!</h1>
+    <p>Dedicated to reducing accidents in general aviation through helping pilots, flight instructors, and flight schools to be more proficient by practicing life-saving maneuvers regularly.</p>
+
+    <hr class="my-8" />
+    <h2 class="flex justify-center mb-2 w-full">Interested in learning more?</h2>
+    {{if .Data.landing_page_enabled}}
+      <p class="flex justify-center mb-4 w-full">Signup for news and special offers as we prepare to launch!</p>
+
+
+      <form action="{{.Data.mailer_lite_url}}" data-code="" method="post" target="_blank">
+        <div class="flex justify-center items-center">
+          <div class="w-1/2">
+            <input type="email" class="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500" data-inputmask="" name="fields[email]" placeholder="Email" autocomplete="email">
+          </div>
+          <div>
+            <button class="ml-2 shadow bg-teal-500 hover:bg-teal-400 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-6 rounded" type="submit">
+              Sign Up
+            </button>
+          </div>
+        </div>
+      </form>
+    {{else}}
+      <p class="flex justify-center mb-4 w-full">Join us today!</p>
+      <a href="/user/signup" class="shadow bg-teal-500 hover:bg-teal-400 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-6 rounded" type="submit">
+        Sign Up
+      </a>
+    {{end}}
+    <hr class="mt-8" />
+  </div>
+
+  <div class="features mb-8">
+    <div class="feature grid grid-rows-3 gap-4">
+      <div class="row-span-1">
+        <h3>For Pilots</h3>
+        <hr/>
+      </div>
+      <p class="row-span-2">Improve your skills and stay proficient with regular practice of critical maneuvers.</p>
+    </div>
+    <div class="feature grid grid-rows-3 gap-4">
+      <div class="row-span-1">
+        <h3>For Instructors</h3>
+        <hr/>
+      </div>
+      <p class="row-span-2">Provide your students with the best training to ensure their safety and proficiency.</p>
+    </div>
+    <div class="feature grid grid-rows-3 gap-4">
+      <div class="row-span-1">
+        <h3>For Flight Schools</h3>
+        <hr/>
+      </div>
+      <p class="row-span-2">Enhance your curriculum with a focus on safety and proficiency in life-saving maneuvers.</p>
+    </div>
+  </div>
+
 {{end}}

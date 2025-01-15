@@ -1,4 +1,5 @@
 -- +goose Up
+-- +goose StatementBegin
 CREATE TABLE IF NOT EXISTS snippets (
   id TEXT NOT NULL PRIMARY KEY,
   title TEXT NOT NULL,
@@ -8,6 +9,9 @@ CREATE TABLE IF NOT EXISTS snippets (
 );
 
 CREATE INDEX IF NOT EXISTS idx_snippets_created ON snippets (created);
+-- +goose StatementEnd
 
 -- +goose Down
+-- +goose StatementBegin
 DROP TABLE IF EXISTS snippets;
+-- +goose StatementEnd

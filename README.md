@@ -8,9 +8,10 @@
 - [x] UUID
 - [x] SQLC integration
 - [x] Fix Dockerfile and deploys
-- [x] Connect to Turso - maybe.. we'll see.. I might just keep it simple with a local file
+- [x] Connect to Turso
 - [x] Replace go-migrate with goose for libsql compatibility
 - [ ] Add HTMX features
+- [ ] Add Landing Page with email signup
 - [ ] Stripe integration
 - [ ] Email sending (SendGrid, Mailgun)
 - [ ] Make a new repo template for future projects

@@ -5,9 +5,9 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"os"
 	"time"
 
-	"github.com/charmbracelet/log"
 	"github.com/etherlabsio/healthcheck/v2"
 	"github.com/etherlabsio/healthcheck/v2/checkers"
 	"github.com/jeremydwayne/snippets/internal/models"
@@ -15,7 +15,23 @@ import (
 )
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
-	log.Info("Handler")
+	landing_page_enabled := os.Getenv("LANDING_PAGE_ENABLED") == "true"
+	mailer_lite_url := os.Getenv("MAILER_LITE_URL")
+	if landing_page_enabled && mailer_lite_url == "" {
+		app.logger.Fatal("ENV missing mailer lite url")
+		return
+	}
+
+	data := app.newTemplateData(r)
+	data.Data = map[string]any{
+		"landing_page_enabled": landing_page_enabled,
+		"mailer_lite_url":      mailer_lite_url,
+	}
+
+	app.render(w, r, http.StatusOK, "home.tmpl", data)
+}
+
+func (app *application) getSnippetIndex(w http.ResponseWriter, r *http.Request) {
 	snippets, err := app.snippets.Latest()
 	if err != nil {
 		app.serverError(w, r, err)
@@ -25,7 +41,7 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	data := app.newTemplateData(r)
 	data.Snippets = snippets
 
-	app.render(w, r, http.StatusOK, "home.tmpl", data)
+	app.render(w, r, http.StatusOK, "index.tmpl", data)
 }
 
 func (app *application) getSnippetView(w http.ResponseWriter, r *http.Request) {
@@ -216,10 +232,6 @@ func (app *application) postUserLogout(w http.ResponseWriter, r *http.Request) {
 	app.sessionManager.Remove(r.Context(), "authenticatedUserID")
 	app.sessionManager.Put(r.Context(), "flash", "You've been logged out successfully!")
 	http.Redirect(w, r, "/", http.StatusSeeOther)
-}
-
-func ping(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("OK"))
 }
 
 func (app *application) health() http.Handler {
