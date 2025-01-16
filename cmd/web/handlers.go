@@ -16,16 +16,10 @@ import (
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	landing_page_enabled := os.Getenv("LANDING_PAGE_ENABLED") == "true"
-	mailer_lite_url := os.Getenv("MAILER_LITE_URL")
-	if landing_page_enabled && mailer_lite_url == "" {
-		app.logger.Fatal("ENV missing mailer lite url")
-		return
-	}
 
 	data := app.newTemplateData(r)
 	data.Data = map[string]any{
 		"landing_page_enabled": landing_page_enabled,
-		"mailer_lite_url":      mailer_lite_url,
 	}
 
 	app.render(w, r, http.StatusOK, "home.tmpl", data)
