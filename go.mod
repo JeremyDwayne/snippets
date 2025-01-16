@@ -10,6 +10,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/justinas/alice v1.2.0
 	github.com/justinas/nosurf v1.1.1
+	github.com/mailerlite/mailerlite-go v1.0.6
 	github.com/pressly/goose/v3 v3.24.1
 	github.com/tursodatabase/go-libsql v0.0.0-20241221181756-6121e81fbf92
 	golang.org/x/crypto v0.31.0
@@ -20,6 +21,7 @@ require (
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/charmbracelet/lipgloss v0.10.0 // indirect
 	github.com/go-logfmt/logfmt v0.6.0 // indirect
+	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/libsql/sqlite-antlr4-parser v0.0.0-20240327125255-dbf53b6cbf06 // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect

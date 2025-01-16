@@ -30,6 +30,7 @@ type application struct {
 	templateCache  map[string]*template.Template
 	formDecoder    *form.Decoder
 	sessionManager *scs.SessionManager
+	mailer         *Mailer
 }
 
 //go:embed migrations
@@ -115,6 +116,8 @@ func main() {
 
 	queries := sqlc.New(db)
 
+	mailer := NewMailer()
+
 	app := &application{
 		logger:         logger,
 		db:             db,
@@ -123,6 +126,7 @@ func main() {
 		templateCache:  templateCache,
 		formDecoder:    formDecoder,
 		sessionManager: sessionManager,
+		mailer:         &mailer,
 	}
 
 	stdlog := logger.StandardLog(log.StandardLogOptions{

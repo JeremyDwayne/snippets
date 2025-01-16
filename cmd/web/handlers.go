@@ -234,6 +234,44 @@ func (app *application) postUserLogout(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
+type landingSignupForm struct {
+	Email               string `form:"email"`
+	validator.Validator `form:"-"`
+}
+
+func (app *application) postLandingSignup(w http.ResponseWriter, r *http.Request) {
+	var form landingSignupForm
+
+	err := app.decodePostForm(r, &form)
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	form.CheckField(validator.NotBlank(form.Email), "email", "This field cannot be blank")
+
+	if !form.Valid() {
+		data := app.newTemplateData(r)
+		data.Form = form
+		app.render(w, r, http.StatusUnprocessableEntity, "home.tmpl", data)
+		return
+	}
+
+	err = app.NewSubscriber(r.Context(), form.Email)
+	if err != nil {
+		app.logger.Error(err)
+		data := app.newTemplateData(r)
+		data.Form = form
+
+		app.sessionManager.Put(r.Context(), "flash", "Unable to sign you up at this time")
+		http.Redirect(w, r, "/", http.StatusUnprocessableEntity)
+		return
+	}
+
+	app.sessionManager.Put(r.Context(), "flash", "You've been added to our email list!")
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
 func (app *application) health() http.Handler {
 	return healthcheck.Handler(
 

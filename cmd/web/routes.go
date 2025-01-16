@@ -32,6 +32,8 @@ func (app *application) routes() http.Handler {
 	mux.Handle("GET /user/login", dynamicMiddleware.ThenFunc(app.getUserLogin))
 	mux.Handle("POST /user/login", dynamicMiddleware.ThenFunc(app.postUserLogin))
 
+	mux.Handle("POST /landing-signup", dynamicMiddleware.ThenFunc(app.postLandingSignup))
+
 	// Require Authentication
 	protectedMiddleware := dynamicMiddleware.Append(app.requireAuthentication)
 	mux.Handle("GET /snippet/create", protectedMiddleware.ThenFunc(app.getSnippetCreate))

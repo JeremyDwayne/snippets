@@ -12,10 +12,11 @@
       <p class="flex justify-center mb-4 w-full">Signup for news and special offers as we prepare to launch!</p>
 
 
-      <form action="{{.Data.mailer_lite_url}}" data-code="" method="post" target="_blank">
+      <form action="/landing-signup" method="post" novalidate>
+        <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
         <div class="flex justify-center items-center">
           <div class="w-1/2">
-            <input type="email" class="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500" data-inputmask="" name="fields[email]" placeholder="Email" autocomplete="email">
+            <input type="email" class="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500" data-inputmask="" name="email" placeholder="Email" autocomplete="email">
           </div>
           <div>
             <button class="ml-2 shadow bg-teal-500 hover:bg-teal-400 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-6 rounded" type="submit">
