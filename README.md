@@ -10,10 +10,10 @@
 - [x] Fix Dockerfile and deploys
 - [x] Connect to Turso
 - [x] Replace go-migrate with goose for libsql compatibility
+- [x] Add Landing Page with email signup
+- [x] Email sending (MailLite)
 - [ ] Add HTMX features
-- [ ] Add Landing Page with email signup
 - [ ] Stripe integration
-- [ ] Email sending (SendGrid, Mailgun)
 - [ ] Make a new repo template for future projects
   - [ ] Generalize the project to be a starting point for new go web apps
   - [ ] Add tests for everything that stays in the base project

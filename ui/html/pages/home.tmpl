@@ -1,106 +1,20 @@
 {{define "title"}}Home{{end}} 
 
 {{define "main"}}
-  
+
   <section id="hero">
     <div class="hero">
-      <h1>Become A Safer Pilot By Enhancing Your Aviation Skills!</h1>
-      <p>Dedicated to reducing accidents in general aviation through helping pilots, flight instructors, and flight schools to be more proficient by practicing life-saving maneuvers regularly.</p>
+      <h1>Quickly share your favorite code snippets!</h1>
+      <p>A simple but convenient tool to share your code across the internet.</p>
 
       <hr class="my-8" />
-      <h2 class="flex justify-center mb-2 w-full">Interested in learning more?</h2>
-      {{if .Data.landing_page_enabled}}
-        <p class="flex justify-center mb-4 w-full">Signup for news and special offers as we prepare to launch!</p>
-
-
-        <form action="/landing-signup" method="post" novalidate>
-          <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
-          <div class="flex justify-center items-center">
-            <div class="w-1/2">
-              <input type="email" class="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500" data-inputmask="" name="email" placeholder="Email" autocomplete="email">
-            </div>
-            <div>
-              <button class="ml-2 shadow bg-teal-500 hover:bg-teal-400 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-6 rounded" type="submit">
-                Sign Up
-              </button>
-            </div>
-          </div>
-        </form>
-      {{else}}
-        <p class="flex justify-center mb-4 w-full">Join us today!</p>
-        <a href="/user/signup" class="shadow bg-teal-500 hover:bg-teal-400 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-6 rounded" type="submit">
-          Sign Up
-        </a>
-      {{end}}
+      <h2 class="text-center text-3xl font-semibold text-blue-600">Interested in learning more?</h2>
+      <p class="flex justify-center mb-4 w-full">Join us today!</p>
+      <a href="/user/signup" class="shadow bg-teal-500 hover:bg-teal-400 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-6 rounded" type="submit">
+        Sign Up
+      </a>
       <hr class="mt-8" />
     </div>
   </section>
-
-  <section id="features">
-    <h2>Features</h2>
-    <div class="features">
-      <div class="feature">
-        <h3>Personalized Suggestions</h3>
-        <p>
-          Receive tailored flight maneuvers and study sessions to maintain
-          your skills.
-        </p>
-      </div>
-      <div class="feature">
-        <h3>Safety First</h3>
-        <p>Identify and address risks with expert-driven recommendations.</p>
-      </div>
-      <div class="feature">
-        <h3>Track Your Progress</h3>
-        <p>
-          Monitor your performance and proficiency over time with detailed
-          analytics.
-        </p>
-      </div>
-    </div>
-  </section>
-
-    <section id="pricing">
-      <h2>Pricing</h2>
-      <div class="pricing">
-        <div class="pricing-option">
-          <h3>Pilots</h3>
-          <p>
-            Perfect for individual pilots looking to enhance their skills and
-            safety.
-          </p>
-          <div class="price">$19/month</div>
-          <div class="details">
-            Access to all personalized training suggestions and analytics.
-          </div>
-          <a href="#">Get Started</a>
-        </div>
-
-        <div class="pricing-option">
-          <h3>Instructors</h3>
-          <p>
-            Designed for flight instructors to manage and assist their students.
-          </p>
-          <div class="price">$49/month</div>
-          <div class="details">
-            Includes student tracking, shared analytics, and instructor tools.
-          </div>
-          <a href="#">Get Started</a>
-        </div>
-
-        <div class="pricing-option">
-          <h3>Flight Schools</h3>
-          <p>
-            Comprehensive tools for managing students and ensuring safety at
-            scale.
-          </p>
-          <div class="price">$199/month</div>
-          <div class="details">
-            Multi-user access, school-wide analytics, and custom integrations.
-          </div>
-          <a href="#">Get Started</a>
-        </div>
-      </div>
-    </section>
 
 {{end}}
